@@ -63,6 +63,7 @@ collections:
           - { label: Специальность (под именем), name: role, widget: string }
           - { label: Короткое описание на главной, name: lead, widget: text }
           - { label: Фото на главной, name: photo, widget: image, required: false }
+          - { label: Фон главной страницы (широкая картинка, лучше от 1920 px), name: hero_bg, widget: image, required: false }
           - { label: Город, name: city, widget: string }
           - { label: Опыт работы (например 2012 — н.в.), name: experience_years, widget: string }
           - { label: Доступен для проектов, name: available, widget: boolean, default: true }

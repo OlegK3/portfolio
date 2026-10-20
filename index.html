@@ -16,17 +16,19 @@ img{display:block;max-width:100%}
 .page.on{display:block}
 /* HERO */
 .hero{position:relative;min-height:100vh;padding:32px 6vw 40px;display:flex;flex-direction:column;
-background:linear-gradient(180deg,rgba(14,13,12,.2),rgba(14,13,12,.95)),
-radial-gradient(120% 80% at 80% 10%,#d9b99b 0%,#6f6a73 35%,#1a1a1d 75%)}
-.topbar{display:flex;gap:16px;align-items:center;font-size:11px;letter-spacing:.3em;color:#2b2723;text-transform:uppercase}
-.topbar i{flex:1;height:1px;background:rgba(0,0,0,.3)}
+background:linear-gradient(180deg,transparent 55%,rgba(14,13,12,.92) 100%),
+linear-gradient(90deg,rgba(14,13,12,.25) 0%,rgba(14,13,12,.55) 45%,rgba(14,13,12,.85) 100%),
+var(--hero-img,radial-gradient(120% 80% at 80% 10%,#5a5360 0%,#27252a 45%,#121110 100%));
+background-size:cover;background-position:center}
+.topbar{display:flex;gap:16px;align-items:center;font-size:11px;letter-spacing:.3em;color:#d8d0c5;text-transform:uppercase}
+.topbar i{flex:1;height:1px;background:rgba(255,255,255,.28)}
 .hero-main{flex:1;display:grid;grid-template-columns:1fr 1.2fr;gap:5vw;align-items:center;padding:6vh 0}
 .photo{aspect-ratio:4/5;max-height:62vh;border:1px solid var(--line);overflow:hidden;background:linear-gradient(160deg,#2a2826,#151413)}
 .photo img{width:100%;height:100%;object-fit:cover}
-h1{font-size:clamp(38px,6vw,76px);line-height:1.02;color:#15120f}
+h1{font-size:clamp(38px,6vw,76px);line-height:1.02;color:#f7f2ea;text-shadow:0 2px 24px rgba(0,0,0,.35)}
 h1 b{display:block;font-weight:800}
-.role{margin:18px 0;font-size:12px;letter-spacing:.4em;color:#5b534a;text-transform:uppercase}
-.lead{max-width:34em;color:#27211c;font-size:17px}
+.role{margin:18px 0;font-size:12px;letter-spacing:.4em;color:#cfc6ba;text-transform:uppercase}
+.lead{max-width:34em;color:#ebe4da;font-size:17px;text-shadow:0 1px 14px rgba(0,0,0,.4)}
 .facts{display:flex;gap:28px;margin-top:28px;font-size:13px;color:#e8e0d6;flex-wrap:wrap}
 .facts small{display:block;color:#b9b0a5}
 .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#2fd06b;margin-left:8px}
@@ -58,6 +60,9 @@ h1 b{display:block;font-weight:800}
 /* MAP */
 #mapBox{height:62vh;min-height:360px;border:1px solid var(--line);background:#0b0a09}
 .leaflet-container{background:#0b0a09;font-family:inherit}
+.dark-tiles{filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.5)}
+.leaflet-control-attribution{background:rgba(14,13,12,.8)!important;color:#9a938a!important}
+.leaflet-control-attribution a{color:#c9c2b8!important}
 .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#1a1816;color:var(--fg)}
 .leaflet-popup-content a{color:var(--accent);cursor:pointer}
 /* CONTACTS */
@@ -199,7 +204,7 @@ function initMap(){
  if(!pts.length){$('mapBox').style.display='none';$('mapEmpty').style.display='block';return}
  if(!map){
   map=L.map('mapBox',{scrollWheelZoom:true});
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:19}).addTo(map);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',maxZoom:19,className:'dark-tiles'}).addTo(map);
   const icon=L.divIcon({className:'',html:'<div style="width:16px;height:16px;border-radius:50%;background:#e8a24a;box-shadow:0 0 0 6px rgba(232,162,74,.25),0 0 22px #e8a24a"></div>',iconSize:[16,16]});
   const g=L.featureGroup(pts.map(x=>{
    const m=L.marker(x.c,{icon}).addTo(map);
@@ -231,6 +236,7 @@ Promise.all([load('content/profile.json'),load('content/projects.json'),load('co
  $('city').textContent=pr.city||'';$('city2').textContent=pr.city||'';
  $('years').textContent=pr.experience_years||'';
  $('avail').style.display=pr.available===false?'none':'';
+ if(pr.hero_bg)document.querySelector('.hero').style.setProperty('--hero-img','url("'+pr.hero_bg+'")');
  if(pr.photo)$('photo').innerHTML=`<img src="${esc(pr.photo)}" alt="${esc(pr.last_name)} ${esc(pr.first_name)}">`;
  if(pr.phone){const d=String(pr.phone).replace(/[^\d+]/g,'').replace(/^8/,'+7');$('phone').textContent=pr.phone;$('phone').href='tel:'+d}
  $('phoneNote').textContent=pr.phone_note||'';
