@@ -1,3 +1,15 @@
 {
-  "projects": []
+  "projects": [
+    {
+      "show_on_map": true,
+      "location": "{\"type\":\"Point\",\"coordinates\":[83.76667,53.33358]}",
+      "title": "Торговый павильон ",
+      "year": "2026",
+      "images": [
+        "/images/uploads/3.jpg",
+        "/images/uploads/1.jpg",
+        "/images/uploads/2.jpg"
+      ]
+    }
+  ]
 }
