@@ -34,6 +34,19 @@
         "/images/uploads/аванес-1.jpg",
         "/images/uploads/аванес-3.jpg"
       ]
+    },
+    {
+      "show_on_map": true,
+      "location": "{\"type\":\"Point\",\"coordinates\":[82.73457,51.66785]}",
+      "title": "Краснощековская детская школа искусств ",
+      "year": "2023",
+      "images": [
+        "/images/uploads/кдши-4.jpg",
+        "/images/uploads/кдши-5.jpg",
+        "/images/uploads/кдши-1.jpg",
+        "/images/uploads/кдши-2.jpg",
+        "/images/uploads/кдши-3.jpg"
+      ]
     }
   ]
 }
