@@ -10,6 +10,30 @@
         "/images/uploads/1.jpg",
         "/images/uploads/2.jpg"
       ]
+    },
+    {
+      "show_on_map": true,
+      "location": "{\"type\":\"Point\",\"coordinates\":[86.1215,51.85956]}",
+      "title": "Гостиничный комплекс \"Катунь река\" ",
+      "year": "2026",
+      "images": [
+        "/images/uploads/6d9a7998-2f09-4a7e-bb1f-b4c10f1e16be.jpg",
+        "/images/uploads/1.jpg",
+        "/images/uploads/укп.jpg",
+        "/images/uploads/ыукеы.jpg",
+        "/images/uploads/6d9a7998-2f09-4a7e-bb1f-b4c10f1e16be.jpg"
+      ]
+    },
+    {
+      "show_on_map": true,
+      "location": "{\"type\":\"Point\",\"coordinates\":[83.78194,53.31536]}",
+      "title": "Магазин ",
+      "year": "2025",
+      "images": [
+        "/images/uploads/аванес-2.jpg",
+        "/images/uploads/аванес-1.jpg",
+        "/images/uploads/аванес-3.jpg"
+      ]
     }
   ]
 }
