@@ -1,0 +1,89 @@
+backend:
+  name: github
+  repo: OlegK3/portfolio
+  branch: main
+
+locale: ru
+publish_mode: simple
+media_folder: images/uploads
+public_folder: /images/uploads
+site_url: /
+display_url: /
+
+collections:
+  - name: site
+    label: Сайт
+    files:
+      - name: projects
+        label: Проекты
+        file: content/projects.json
+        format: json
+        fields:
+          - label: Проекты
+            name: projects
+            widget: list
+            label_singular: проект
+            summary: "{{fields.title}} · {{fields.year}}"
+            fields:
+              - { label: Название, name: title, widget: string }
+              - { label: Год, name: year, widget: string, required: false }
+              - label: Картинки проекта (3–5 штук, первая станет обложкой)
+                name: images
+                widget: list
+                required: false
+                field: { label: Картинка, name: image, widget: image }
+              - { label: Показывать на карте, name: show_on_map, widget: boolean, default: false, required: false }
+              - label: Место на карте (имеет значение, только если включено выше)
+                name: location
+                widget: map
+                type: Point
+                decimals: 5
+                height: 300px
+                required: false
+                default: '{"type":"Point","coordinates":[83.76,53.35]}'
+
+      - name: visualizations
+        label: Визуализация
+        file: content/visualizations.json
+        format: json
+        fields:
+          - label: Картинки
+            name: images
+            widget: list
+            required: false
+            field: { label: Картинка, name: image, widget: image }
+
+      - name: profile
+        label: Главная и контакты
+        file: content/profile.json
+        format: json
+        fields:
+          - { label: Фамилия, name: last_name, widget: string }
+          - { label: Имя и отчество, name: first_name, widget: string }
+          - { label: Специальность (под именем), name: role, widget: string }
+          - { label: Короткое описание на главной, name: lead, widget: text }
+          - { label: Фото на главной, name: photo, widget: image, required: false }
+          - { label: Город, name: city, widget: string }
+          - { label: Опыт работы (например 2012 — н.в.), name: experience_years, widget: string }
+          - { label: Доступен для проектов, name: available, widget: boolean, default: true }
+          - { label: Телефон, name: phone, widget: string }
+          - { label: Пояснение к телефону, name: phone_note, widget: string, required: false }
+          - { label: Почта, name: email, widget: string }
+          - { label: Обо мне, name: about, widget: text }
+          - label: Образование
+            name: education
+            widget: list
+            label_singular: запись
+            fields:
+              - { label: Годы, name: years, widget: string }
+              - { label: Учебное заведение, name: place, widget: string }
+              - { label: Примечание, name: note, widget: string, required: false }
+          - label: Опыт работы
+            name: jobs
+            widget: list
+            label_singular: место работы
+            fields:
+              - { label: Годы, name: years, widget: string }
+              - { label: Компания и должность, name: place, widget: string }
+              - { label: Чем занимался, name: note, widget: string, required: false }
+          - { label: Программы, name: software, widget: string }

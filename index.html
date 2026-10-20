@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Комлев Олег — архитектор / визуализатор</title>
+<meta name="description" content="Портфолио архитектора и визуализатора. Проекты, визуализации, объекты на карте. Барнаул.">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--bg:#0e0d0c;--fg:#f2ede6;--mute:#9a938a;--accent:#e8a24a;--line:rgba(255,255,255,.14)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:"Helvetica Neue",Arial,sans-serif;font-weight:300;line-height:1.5}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+.page{display:none;min-height:100vh}
+.page.on{display:block}
+/* HERO */
+.hero{position:relative;min-height:100vh;padding:32px 6vw 40px;display:flex;flex-direction:column;
+background:linear-gradient(180deg,rgba(14,13,12,.2),rgba(14,13,12,.95)),
+radial-gradient(120% 80% at 80% 10%,#d9b99b 0%,#6f6a73 35%,#1a1a1d 75%)}
+.topbar{display:flex;gap:16px;align-items:center;font-size:11px;letter-spacing:.3em;color:#2b2723;text-transform:uppercase}
+.topbar i{flex:1;height:1px;background:rgba(0,0,0,.3)}
+.hero-main{flex:1;display:grid;grid-template-columns:1fr 1.2fr;gap:5vw;align-items:center;padding:6vh 0}
+.photo{aspect-ratio:4/5;max-height:62vh;border:1px solid var(--line);overflow:hidden;background:linear-gradient(160deg,#2a2826,#151413)}
+.photo img{width:100%;height:100%;object-fit:cover}
+h1{font-size:clamp(38px,6vw,76px);line-height:1.02;color:#15120f}
+h1 b{display:block;font-weight:800}
+.role{margin:18px 0;font-size:12px;letter-spacing:.4em;color:#5b534a;text-transform:uppercase}
+.lead{max-width:34em;color:#27211c;font-size:17px}
+.facts{display:flex;gap:28px;margin-top:28px;font-size:13px;color:#e8e0d6;flex-wrap:wrap}
+.facts small{display:block;color:#b9b0a5}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#2fd06b;margin-left:8px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.tile{position:relative;height:200px;padding:20px;border:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;transition:.3s;background-size:cover;background-position:center}
+.tile:hover{border-color:var(--accent);transform:translateY(-3px)}
+.tile .n{font-size:12px;color:var(--mute)}
+.tile h3{font-size:22px;letter-spacing:.08em;font-weight:300}
+.tile .ar{width:38px;height:38px;border:1px solid var(--fg);border-radius:50%;display:grid;place-items:center}
+.t1{background-image:linear-gradient(135deg,#2c3340,#0f1114)}
+.t2{background-image:linear-gradient(135deg,#3d3025,#120f0c)}
+.t3{background-image:radial-gradient(circle at 60% 50%,#4a3a22 0,#111 55%)}
+.t4{background-image:linear-gradient(135deg,#40322a,#15110f)}
+/* INNER */
+.inner{padding:28px 6vw 80px}
+.back{display:inline-block;margin-bottom:28px;font-size:13px;letter-spacing:.2em;color:var(--mute)}
+.back:hover{color:var(--accent)}
+.inner h2{font-size:clamp(30px,5vw,56px);font-weight:300;letter-spacing:.06em;margin-bottom:34px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+.card{cursor:pointer}
+.ph{aspect-ratio:4/3;border:1px solid var(--line);transition:.3s;background:linear-gradient(135deg,#2a2826,#151413);overflow:hidden}
+.ph img{width:100%;height:100%;object-fit:cover}
+.card:hover .ph{border-color:var(--accent)}
+.card p{margin-top:10px;font-size:17px}
+.card span{font-size:12px;color:var(--mute)}
+.empty{color:var(--mute);padding:40px 0}
+.vgrid{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.vgrid .ph{aspect-ratio:16/10;cursor:zoom-in}
+/* MAP */
+#mapBox{height:62vh;min-height:360px;border:1px solid var(--line);background:#0b0a09}
+.leaflet-container{background:#0b0a09;font-family:inherit}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#1a1816;color:var(--fg)}
+.leaflet-popup-content a{color:var(--accent);cursor:pointer}
+/* CONTACTS */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:6vw}
+.cols h4{font-size:12px;letter-spacing:.3em;color:var(--mute);margin:26px 0 8px;font-weight:400}
+.cols p,.cols li{font-size:17px}
+.cols ul{list-style:none}
+.cols li{padding:8px 0;border-bottom:1px solid var(--line)}
+.cols li small{display:block;color:var(--mute);font-size:14px}
+.big a{font-size:26px;display:block;margin-top:4px;word-break:break-all}
+.big a:hover{color:var(--accent)}
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(8,7,6,.97);display:none;overflow:auto;padding:28px 6vw;z-index:1000}
+.modal.on{display:block}
+.modal .x{position:fixed;right:5vw;top:16px;font-size:38px;cursor:pointer;z-index:2;line-height:1}
+.modal h2{margin-bottom:24px;font-weight:300;font-size:34px;padding-right:50px}
+.modal .grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.modal .ph{aspect-ratio:3/2;cursor:zoom-in}
+.viewer{position:fixed;inset:0;background:#000;display:none;z-index:2000;align-items:center;justify-content:center}
+.viewer.on{display:flex}
+.viewer img{max-width:94vw;max-height:92vh;object-fit:contain}
+.viewer .x,.viewer .nav{position:absolute;font-size:44px;cursor:pointer;color:#fff;user-select:none;padding:10px 18px;line-height:1}
+.viewer .x{right:10px;top:6px}
+.viewer .prev{left:6px}.viewer .next{right:6px}
+.viewer .nav{top:50%;transform:translateY(-50%)}
+@media(max-width:820px){.hero-main,.cols{grid-template-columns:1fr}.tiles{grid-template-columns:1fr 1fr}.tile{height:150px}.photo{max-height:46vh}}
+</style>
+</head>
+<body>
+
+<section class="page on" id="home">
+ <div class="hero">
+  <div class="topbar"><span id="cityTop"></span><i></i></div>
+  <div class="hero-main">
+   <div class="photo" id="photo"></div>
+   <div>
+    <h1><b id="ln"></b><span id="fn"></span></h1>
+    <div class="role" id="role"></div>
+    <p class="lead" id="lead"></p>
+    <div class="facts">
+     <div><small>Базируюсь в</small><span id="city"></span></div>
+     <div><small>Опыт работы</small><span id="years"></span></div>
+     <div id="avail"><small>Доступен</small>для проектов<span class="dot"></span></div>
+    </div>
+   </div>
+  </div>
+  <div class="tiles">
+   <a class="tile t1" id="tile1" href="#projects"><span class="n">01 ——</span><h3>ПРОЕКТЫ</h3><span class="ar">→</span></a>
+   <a class="tile t2" id="tile2" href="#viz"><span class="n">02 ——</span><h3>ВИЗУАЛИЗАЦИЯ</h3><span class="ar">→</span></a>
+   <a class="tile t3" href="#map"><span class="n">03 ——</span><h3>ОБЪЕКТЫ<br>НА КАРТЕ</h3><span class="ar">→</span></a>
+   <a class="tile t4" href="#contacts"><span class="n">04 ——</span><h3>КОНТАКТЫ</h3><span class="ar">→</span></a>
+  </div>
+ </div>
+</section>
+
+<section class="page" id="projects"><div class="inner">
+ <a class="back" href="#home">← НАЗАД</a><h2>ПРОЕКТЫ</h2>
+ <div class="grid" id="projGrid"></div>
+</div></section>
+
+<section class="page" id="viz"><div class="inner">
+ <a class="back" href="#home">← НАЗАД</a><h2>ВИЗУАЛИЗАЦИЯ</h2>
+ <div class="grid vgrid" id="vizGrid"></div>
+</div></section>
+
+<section class="page" id="map"><div class="inner">
+ <a class="back" href="#home">← НАЗАД</a><h2>ОБЪЕКТЫ НА КАРТЕ</h2>
+ <div id="mapBox"></div>
+ <p class="empty" id="mapEmpty" style="display:none">Объекты на карте появятся здесь.</p>
+</div></section>
+
+<section class="page" id="contacts"><div class="inner">
+ <a class="back" href="#home">← НАЗАД</a><h2>КОНТАКТЫ</h2>
+ <div class="cols">
+  <div class="big">
+   <h4>ТЕЛЕФОН</h4>
+   <a id="phone" href="#"></a>
+   <p id="phoneNote" style="color:var(--mute);font-size:14px;margin-top:6px"></p>
+   <h4>ПОЧТА</h4>
+   <a id="email" href="#"></a>
+   <h4>ГОРОД</h4>
+   <p id="city2"></p>
+  </div>
+  <div>
+   <h4>ОБО МНЕ</h4>
+   <p id="about"></p>
+   <h4>ОБРАЗОВАНИЕ</h4>
+   <ul id="edu"></ul>
+   <h4>ОПЫТ РАБОТЫ</h4>
+   <ul id="jobs"></ul>
+   <h4>ПРОГРАММЫ</h4>
+   <p id="soft"></p>
+  </div>
+ </div>
+</div></section>
+
+<div class="modal" id="modal"><span class="x" id="mx">×</span><h2 id="mt"></h2><div class="grid" id="mg"></div></div>
+<div class="viewer" id="viewer"><span class="x" id="vx">×</span><span class="nav prev" id="vp">‹</span><img id="vimg" alt=""><span class="nav next" id="vn">›</span></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const load=u=>fetch(u+'?v='+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({}));
+let projects=[],viz=[],map=null,mapReady=false;
+
+/* ---- просмотр картинок на весь экран ---- */
+let vList=[],vIdx=0;
+function openViewer(list,i){vList=list;vIdx=i;showV();$('viewer').classList.add('on')}
+function showV(){$('vimg').src=vList[vIdx]}
+function stepV(d){vIdx=(vIdx+d+vList.length)%vList.length;showV()}
+$('vx').onclick=()=>$('viewer').classList.remove('on');
+$('vp').onclick=()=>stepV(-1);$('vn').onclick=()=>stepV(1);
+$('viewer').onclick=e=>{if(e.target.id==='viewer')$('viewer').classList.remove('on')};
+addEventListener('keydown',e=>{
+ if($('viewer').classList.contains('on')){if(e.key==='Escape')$('viewer').classList.remove('on');if(e.key==='ArrowLeft')stepV(-1);if(e.key==='ArrowRight')stepV(1)}
+ else if(e.key==='Escape')$('modal').classList.remove('on');
+});
+
+/* ---- проект ---- */
+function openProject(i){
+ const p=projects[i];$('mt').textContent=p.title||'';
+ const imgs=(p.images||[]).filter(Boolean);
+ $('mg').innerHTML=imgs.length?imgs.map((s,j)=>`<div class="ph" data-j="${j}"><img src="${esc(s)}" alt="${esc(p.title)}" loading="lazy"></div>`).join(''):'<p class="empty">Картинки скоро появятся.</p>';
+ $('mg').querySelectorAll('.ph').forEach(el=>el.onclick=()=>openViewer(imgs,+el.dataset.j));
+ $('modal').classList.add('on');
+}
+$('mx').onclick=()=>$('modal').classList.remove('on');
+
+/* ---- карта ---- */
+function pointOf(p){
+ if(!p.show_on_map||!p.location)return null;
+ try{const g=typeof p.location==='string'?JSON.parse(p.location):p.location;
+  if(g&&g.coordinates&&g.coordinates.length>=2)return [g.coordinates[1],g.coordinates[0]]}catch(e){}
+ return null;
+}
+function initMap(){
+ const pts=projects.map((p,i)=>({p,i,c:pointOf(p)})).filter(x=>x.c);
+ if(!pts.length){$('mapBox').style.display='none';$('mapEmpty').style.display='block';return}
+ if(!map){
+  map=L.map('mapBox',{scrollWheelZoom:true});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:19}).addTo(map);
+  const icon=L.divIcon({className:'',html:'<div style="width:16px;height:16px;border-radius:50%;background:#e8a24a;box-shadow:0 0 0 6px rgba(232,162,74,.25),0 0 22px #e8a24a"></div>',iconSize:[16,16]});
+  const g=L.featureGroup(pts.map(x=>{
+   const m=L.marker(x.c,{icon}).addTo(map);
+   const el=document.createElement('div');el.innerHTML=`<b>${esc(x.p.title)}</b><br><a>Открыть проект →</a>`;
+   el.querySelector('a').onclick=()=>openProject(x.i);
+   return m.bindPopup(el);
+  }));
+  map.fitBounds(g.getBounds().pad(.4),{maxZoom:14});
+ }
+ setTimeout(()=>map.invalidateSize(),50);
+}
+
+/* ---- маршруты ---- */
+function route(){
+ const h=(location.hash||'#home').slice(1);
+ document.querySelectorAll('.page').forEach(s=>s.classList.toggle('on',s.id===h));
+ window.scrollTo(0,0);
+ if(h==='map'&&mapReady)initMap();
+}
+addEventListener('hashchange',route);
+
+/* ---- загрузка данных ---- */
+Promise.all([load('content/profile.json'),load('content/projects.json'),load('content/visualizations.json')]).then(([pr,pj,vz])=>{
+ projects=(pj.projects||[]);viz=(vz.images||[]).filter(Boolean);
+ document.title=`${pr.last_name||''} ${pr.first_name||''} — ${pr.role||''}`.trim();
+ $('cityTop').textContent=pr.city||'';
+ $('ln').textContent=pr.last_name||'';$('fn').textContent=pr.first_name||'';
+ $('role').textContent=pr.role||'';$('lead').textContent=pr.lead||'';
+ $('city').textContent=pr.city||'';$('city2').textContent=pr.city||'';
+ $('years').textContent=pr.experience_years||'';
+ $('avail').style.display=pr.available===false?'none':'';
+ if(pr.photo)$('photo').innerHTML=`<img src="${esc(pr.photo)}" alt="${esc(pr.last_name)} ${esc(pr.first_name)}">`;
+ if(pr.phone){const d=String(pr.phone).replace(/[^\d+]/g,'').replace(/^8/,'+7');$('phone').textContent=pr.phone;$('phone').href='tel:'+d}
+ $('phoneNote').textContent=pr.phone_note||'';
+ if(pr.email){$('email').textContent=pr.email;$('email').href='mailto:'+pr.email}
+ $('about').textContent=pr.about||'';
+ const li=a=>(a||[]).map(x=>`<li>${esc(x.years)} · ${esc(x.place)}${x.note?`<small>${esc(x.note)}</small>`:''}</li>`).join('');
+ $('edu').innerHTML=li(pr.education);$('jobs').innerHTML=li(pr.jobs);
+ $('soft').textContent=pr.software||'';
+
+ $('projGrid').innerHTML=projects.length?projects.map((p,i)=>{
+  const cover=(p.images||[]).filter(Boolean)[0];
+  return `<div class="card" data-i="${i}"><div class="ph">${cover?`<img src="${esc(cover)}" alt="${esc(p.title)}" loading="lazy">`:''}</div><p>${esc(p.title)}</p><span>${esc(p.year||'')}</span></div>`}).join(''):'<p class="empty">Проекты скоро появятся.</p>';
+ $('projGrid').querySelectorAll('.card').forEach(c=>c.onclick=()=>openProject(+c.dataset.i));
+
+ $('vizGrid').innerHTML=viz.length?viz.map((s,i)=>`<div class="ph" data-i="${i}"><img src="${esc(s)}" alt="Визуализация" loading="lazy"></div>`).join(''):'<p class="empty">Визуализации скоро появятся.</p>';
+ $('vizGrid').querySelectorAll('.ph').forEach(el=>el.onclick=()=>openViewer(viz,+el.dataset.i));
+
+ const c1=projects.map(p=>(p.images||[])[0]).find(Boolean);
+ if(c1)$('tile1').style.backgroundImage=`linear-gradient(rgba(10,9,8,.55),rgba(10,9,8,.55)),url("${c1}")`;
+ if(viz[0])$('tile2').style.backgroundImage=`linear-gradient(rgba(10,9,8,.55),rgba(10,9,8,.55)),url("${viz[0]}")`;
+ mapReady=true;route();
+});
+route();
+</script>
+</body>
+</html>
