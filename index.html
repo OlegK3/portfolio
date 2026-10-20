@@ -42,6 +42,11 @@ h1 b{display:block;font-weight:800}
 .t2{background-image:linear-gradient(135deg,#3d3025,#120f0c)}
 .t3{background-image:radial-gradient(circle at 60% 50%,#4a3a22 0,#111 55%)}
 .t4{background-image:linear-gradient(135deg,#40322a,#15110f)}
+#miniMap{position:absolute;inset:0;z-index:0;pointer-events:none;background:#0b0a09}
+.t3::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(10,9,8,.55),rgba(10,9,8,.15) 60%,rgba(10,9,8,.4))}
+.t3>*:not(#miniMap){position:relative;z-index:2}
+.t3 h3{text-shadow:0 2px 14px rgba(0,0,0,.8)}
+.t3 .leaflet-control-attribution{font-size:9px;padding:0 4px;position:absolute;right:0;bottom:0}
 /* INNER */
 .inner{padding:28px 6vw 80px}
 .back{display:inline-block;margin-bottom:28px;font-size:13px;letter-spacing:.2em;color:var(--mute)}
@@ -112,7 +117,7 @@ h1 b{display:block;font-weight:800}
   <div class="tiles">
    <a class="tile t1" id="tile1" href="#projects"><span class="n">01 ——</span><h3>ПРОЕКТЫ</h3><span class="ar">→</span></a>
    <a class="tile t2" id="tile2" href="#viz"><span class="n">02 ——</span><h3>ВИЗУАЛИЗАЦИЯ</h3><span class="ar">→</span></a>
-   <a class="tile t3" href="#map"><span class="n">03 ——</span><h3>ОБЪЕКТЫ<br>НА КАРТЕ</h3><span class="ar">→</span></a>
+   <a class="tile t3" href="#map"><div id="miniMap"></div><span class="n">03 ——</span><h3>ОБЪЕКТЫ<br>НА КАРТЕ</h3><span class="ar">→</span></a>
    <a class="tile t4" href="#contacts"><span class="n">04 ——</span><h3>КОНТАКТЫ</h3><span class="ar">→</span></a>
   </div>
  </div>
@@ -167,7 +172,7 @@ h1 b{display:block;font-weight:800}
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const load=u=>fetch(u+'?v='+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({}));
-let projects=[],viz=[],map=null,mapReady=false;
+let projects=[],viz=[],map=null,mapReady=false,mini=null,miniB=null;
 
 /* ---- просмотр картинок на весь экран ---- */
 let vList=[],vIdx=0;
@@ -217,12 +222,27 @@ function initMap(){
  setTimeout(()=>map.invalidateSize(),50);
 }
 
+/* ---- мини-карта в плитке на главной ---- */
+function fitMini(){if(!mini||!miniB)return;mini.invalidateSize();mini.fitBounds(miniB.pad(.5),{maxZoom:12,animate:false})}
+function initMini(){
+ if(!window.L)return;
+ const pts=projects.map(pointOf).filter(Boolean);
+ if(!pts.length)return;
+ mini=L.map('miniMap',{zoomControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,touchZoom:false,tap:false,attributionControl:false});
+ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,className:'dark-tiles'}).addTo(mini);
+ L.control.attribution({prefix:false}).addAttribution('© OpenStreetMap').addTo(mini);
+ const icon=L.divIcon({className:'',html:'<div style="width:12px;height:12px;border-radius:50%;background:#e8a24a;box-shadow:0 0 0 5px rgba(232,162,74,.25),0 0 18px #e8a24a"></div>',iconSize:[12,12]});
+ pts.forEach(c=>L.marker(c,{icon,interactive:false,keyboard:false}).addTo(mini));
+ miniB=L.latLngBounds(pts);fitMini();
+}
+
 /* ---- маршруты ---- */
 function route(){
  const h=(location.hash||'#home').slice(1);
  document.querySelectorAll('.page').forEach(s=>s.classList.toggle('on',s.id===h));
  window.scrollTo(0,0);
  if(h==='map'&&mapReady)initMap();
+ if(h==='home')setTimeout(fitMini,30);
 }
 addEventListener('hashchange',route);
 
@@ -257,6 +277,7 @@ Promise.all([load('content/profile.json'),load('content/projects.json'),load('co
  const c1=projects.map(p=>(p.images||[])[0]).find(Boolean);
  if(c1)$('tile1').style.backgroundImage=`linear-gradient(rgba(10,9,8,.55),rgba(10,9,8,.55)),url("${c1}")`;
  if(viz[0])$('tile2').style.backgroundImage=`linear-gradient(rgba(10,9,8,.55),rgba(10,9,8,.55)),url("${viz[0]}")`;
+ initMini();
  mapReady=true;route();
 });
 route();
